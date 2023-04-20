@@ -24,7 +24,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public String processOrder(@Validated TacoOrder order, Errors errors,
+    public String processOrder(@Valid TacoOrder order, Errors errors,
                                SessionStatus sessionStatus) {
 
         if (errors.hasErrors()) {

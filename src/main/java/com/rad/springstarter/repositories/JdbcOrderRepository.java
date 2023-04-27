@@ -15,14 +15,17 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
-public class JdbcOrderRepository implements OrderRepository{
+public class JdbcOrderRepository implements OrderRepository {
     private JdbcOperations jdbcOperations;
+
     public JdbcOrderRepository(JdbcOperations jdbcOperations) {
 
         this.jdbcOperations = jdbcOperations;
     }
+
     @Override
     @Transactional
     public TacoOrder save(TacoOrder order) {
@@ -56,7 +59,7 @@ public class JdbcOrderRepository implements OrderRepository{
         long orderId = keyHolder.getKey().longValue();
         order.setId(orderId);
         List<Taco> tacos = order.getTacos();
-        int i=0;
+        int i = 0;
         for (Taco taco : tacos) {
             saveTaco(orderId, i++, taco);
         }
@@ -84,7 +87,9 @@ public class JdbcOrderRepository implements OrderRepository{
         jdbcOperations.update(psc, keyHolder);
         long tacoId = keyHolder.getKey().longValue();
         taco.setId(tacoId);
-        saveIngredientRefs(tacoId, taco.getIngredients());
+        saveIngredientRefs(tacoId, taco.getIngredients().stream()
+                .map(ingredient -> new IngredientRef(ingredient.getName()))
+                .collect(Collectors.toList()));
         return tacoId;
     }
 
